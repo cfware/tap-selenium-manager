@@ -1,0 +1,7 @@
+*.tgz
+coverage
+.eslintrc.json
+.travis.yml
+test.js
+htdocs
+tap-snapshots

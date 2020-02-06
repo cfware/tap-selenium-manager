@@ -1,0 +1,4 @@
+version: ~> 1.0
+import:
+  - cfware/travis-ci:node-esm.yml
+  - cfware/travis-ci:npm-no-cache.yml
