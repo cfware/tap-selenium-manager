@@ -56,14 +56,55 @@ async function main() {
 	};
 
 	await testBrowser(t, 'chrome', baseURL, pages);
-	t.test('after chrome', async t => {
+	await t.test('after chrome', async t => {
 		t.same(JSON.parse(JSON.stringify(global.__coverage__)), gotCoverage);
+		t.ok(Object.keys(global.__coverage__).length);
 	});
 	global.__coverage__ = {};
 
-	await testBrowser(t, 'firefox', baseURL, pages);
-	t.test('after firefox', async t => {
+	const simulateDaemon = {
+		calls: {
+			start: 0,
+			stop: 0,
+			url: 0
+		},
+		async start() {
+			simulateDaemon.calls.start++;
+		},
+		async stop() {
+			simulateDaemon.calls.stop++;
+		},
+		get baseURL() {
+			simulateDaemon.calls.url++;
+			return baseURL;
+		}
+	};
+	await testBrowser(t, 'firefox', simulateDaemon, {
+		async 'page1.html'(t, selenium) {
+			t.same(simulateDaemon.calls, {
+				start: 1,
+				stop: 0,
+				url: 1
+			});
+			await pages['page1.html'](t, selenium);
+		},
+		async 'page2.html'(t, selenium) {
+			t.same(simulateDaemon.calls, {
+				start: 1,
+				stop: 0,
+				url: 1
+			});
+			await pages['page2.html'](t, selenium);
+		}
+	});
+	await t.test('after firefox', async t => {
+		t.same(simulateDaemon.calls, {
+			start: 1,
+			stop: 1,
+			url: 1
+		});
 		t.same(JSON.parse(JSON.stringify(global.__coverage__)), gotCoverage);
+		t.ok(Object.keys(global.__coverage__).length);
 	});
 
 	t.test('platformBin for linux', platformTest('linux'));

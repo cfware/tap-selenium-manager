@@ -23,8 +23,26 @@ export async function grabImage(element) {
 	return png.write(png.read(Buffer.from(image64, 'base64')));
 }
 
-export async function testBrowser(t, browser, baseURL, pages) {
+async function getBaseURL(daemon) {
+	if (typeof daemon === 'string') {
+		return daemon;
+	}
+
+	await daemon.start();
+	return daemon.baseURL;
+}
+
+async function stopDaemon(daemon) {
+	if (typeof daemon === 'string') {
+		return;
+	}
+
+	await daemon.stop();
+}
+
+export async function testBrowser(t, browser, daemon, pages) {
 	let builder;
+	let foundCoverage = false;
 	const coverageMap = libCoverage.createCoverageMap();
 
 	switch (browser) {
@@ -49,32 +67,37 @@ export async function testBrowser(t, browser, baseURL, pages) {
 		return;
 	}
 
-	return t.test(browser, {buffered: false}, async t => {
+	const baseURL = await getBaseURL(daemon);
+	await t.test(browser, {buffered: false}, async t => {
 		for (const [page, implementation] of Object.entries(pages)) {
 			t.test(page, {buffered: false}, async t => {
 				await selenium.get(`${baseURL}${page}`);
 				await implementation(t, selenium);
 
-				const coverage = await selenium.executeScript(
-					/* istanbul ignore next */
-					() => window.__coverage__
-				);
+				if (coverageMap) {
+					const coverage = await selenium.executeScript(
+						/* istanbul ignore next */
+						() => window.__coverage__
+					);
 
-				if (coverage) {
-					/* Merge coverage object from the browser running this test. */
-					coverageMap.merge(coverage);
+					if (coverage) {
+						foundCoverage = true;
+						/* Merge coverage object from the browser running this test. */
+						coverageMap.merge(coverage);
+					}
 				}
 			});
 		}
-
-		t.test('teardown', {buffered: false}, async () => {
-			await selenium.quit();
-
-			/* istanbul ignore else */
-			if (coverageMap && global.__coverage__) {
-				coverageMap.merge(global.__coverage__);
-				global.__coverage__ = coverageMap.toJSON();
-			}
-		});
 	});
+
+	await selenium.quit();
+	await stopDaemon(daemon);
+
+	if (foundCoverage) {
+		if (global.__coverage__) {
+			coverageMap.merge(global.__coverage__);
+		}
+
+		global.__coverage__ = coverageMap.toJSON();
+	}
 }
