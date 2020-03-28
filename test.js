@@ -7,7 +7,9 @@ import fastifyStatic from 'fastify-static';
 import {grabImage, testBrowser} from './index.js';
 import platformBin from './platform-bin.js';
 
+const selfCoverage = global.__coverage__;
 global.__coverage__ = {};
+delete process.env.NODE_OPTIONS;
 
 const deadBrowser = () => {};
 const babelrc = {plugins: ['babel-plugin-istanbul']};
@@ -110,6 +112,8 @@ async function main() {
 	t.test('platformBin for linux', platformTest('linux'));
 	t.test('platformBin for mac', platformTest('mac'));
 	t.test('platformBin for win32', platformTest('win32'));
+
+	global.__coverage__ = selfCoverage;
 }
 
 main().catch(t.error);

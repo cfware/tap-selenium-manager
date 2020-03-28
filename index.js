@@ -63,7 +63,13 @@ export async function testBrowser(t, browser, daemon, pages) {
 
 	const selenium = await build(builder);
 	if (!selenium) {
-		t.test(browser, {skip: true}, () => {});
+		t.test(
+			browser,
+			{skip: true},
+			/* istanbul ignore next */
+			() => {}
+		);
+
 		return;
 	}
 
@@ -74,6 +80,7 @@ export async function testBrowser(t, browser, daemon, pages) {
 				await selenium.get(`${baseURL}${page}`);
 				await implementation(t, selenium);
 
+				/* istanbul ignore else */
 				if (coverageMap) {
 					const coverage = await selenium.executeScript(
 						/* istanbul ignore next */
@@ -93,7 +100,9 @@ export async function testBrowser(t, browser, daemon, pages) {
 	await selenium.quit();
 	await stopDaemon(daemon);
 
+	/* istanbul ignore else */
 	if (foundCoverage) {
+		/* istanbul ignore else */
 		if (global.__coverage__) {
 			coverageMap.merge(global.__coverage__);
 		}

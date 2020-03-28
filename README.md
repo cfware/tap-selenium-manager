@@ -1,6 +1,6 @@
 # @cfware/tap-selenium-manager
 
-[![Travis CI][travis-image]][travis-url]
+![Tests][tests-status]
 [![Greenkeeper badge][gk-image]](https://greenkeeper.io/)
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
@@ -45,8 +45,7 @@ main().catch(t.error);
 
 [npm-image]: https://img.shields.io/npm/v/@cfware/tap-selenium-manager.svg
 [npm-url]: https://npmjs.org/package/@cfware/tap-selenium-manager
-[travis-image]: https://travis-ci.org/cfware/tap-selenium-manager.svg?branch=master
-[travis-url]: https://travis-ci.org/cfware/tap-selenium-manager
+[tests-status]: https://github.com/cfware/tap-selenium-manager/workflows/Tests/badge.svg
 [gk-image]: https://badges.greenkeeper.io/cfware/tap-selenium-manager.svg
 [downloads-image]: https://img.shields.io/npm/dm/@cfware/tap-selenium-manager.svg
 [downloads-url]: https://npmjs.org/package/@cfware/tap-selenium-manager
