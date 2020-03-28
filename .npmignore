@@ -1,7 +1,9 @@
 *.tgz
+.nyc_output
 coverage
 .eslintrc.json
-.travis.yml
+.github
+nyc.config.cjs
 test.js
 htdocs
 tap-snapshots
