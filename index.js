@@ -66,7 +66,7 @@ export async function testBrowser(t, browser, daemon, pages) {
 		t.test(
 			browser,
 			{skip: true},
-			/* istanbul ignore next */
+			/* istanbul ignore next: unreachable but still required */
 			() => {}
 		);
 
@@ -80,10 +80,10 @@ export async function testBrowser(t, browser, daemon, pages) {
 				await selenium.get(`${baseURL}${page}`);
 				await implementation(t, selenium);
 
-				/* istanbul ignore else */
+				/* istanbul ignore else: coverage is always enabled in testing */
 				if (coverageMap) {
 					const coverage = await selenium.executeScript(
-						/* istanbul ignore next */
+						/* istanbul ignore next: sent to browser */
 						() => window.__coverage__
 					);
 
@@ -100,9 +100,9 @@ export async function testBrowser(t, browser, daemon, pages) {
 	await selenium.quit();
 	await stopDaemon(daemon);
 
-	/* istanbul ignore else */
+	/* istanbul ignore else: coverage is always enabled in testing */
 	if (foundCoverage) {
-		/* istanbul ignore else */
+		/* istanbul ignore else: coverage is always enabled in testing */
 		if (global.__coverage__) {
 			coverageMap.merge(global.__coverage__);
 		}
