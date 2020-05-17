@@ -32,7 +32,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.8.4",
 		"@cfware/lint": "^1.1.2",
-		"@cfware/nyc": "^0.6.0",
+		"@cfware/nyc": "^0.7.0",
 		"@istanbuljs/esm-loader-hook": "^0.1.0",
 		"babel-plugin-istanbul": "^6.0.0",
 		"chromedriver": "^80.0.0",
