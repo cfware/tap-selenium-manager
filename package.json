@@ -5,7 +5,6 @@
 	"main": "index.js",
 	"type": "module",
 	"scripts": {
-		"release": "standard-version --sign",
 		"pretest": "cfware-lint .",
 		"test": "npm run -s tests-only",
 		"tests-only": "cross-env NODE_OPTIONS='--experimental-loader @istanbuljs/esm-loader-hook' nyc -s node test.js|tap-yaml-summary",
@@ -43,7 +42,6 @@
 		"geckodriver": "^1.19.1",
 		"libtap": "^0.3.0",
 		"nyc": "^15.0.0",
-		"standard-version": "^8.0.0",
 		"tap-yaml-summary": "^0.1.0"
 	}
 }
