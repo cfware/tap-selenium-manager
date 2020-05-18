@@ -1,5 +1,4 @@
 *.tgz
-.nyc_output
 coverage
 .eslintrc.json
 .github
