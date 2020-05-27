@@ -70,7 +70,7 @@ export async function testBrowser(t, browser, daemon, pages) {
 			() => {}
 		);
 
-		return;
+		return false;
 	}
 
 	const baseURL = await getBaseURL(daemon);
@@ -109,4 +109,6 @@ export async function testBrowser(t, browser, daemon, pages) {
 
 		global.__coverage__ = coverageMap.toJSON();
 	}
+
+	return true;
 }

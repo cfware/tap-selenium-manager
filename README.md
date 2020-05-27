@@ -21,8 +21,12 @@ const pages = {
 
 async function main() {
 	const baseURL = await startHTTPD();
-	await testBrowser(t, 'firefox', baseURL, pages);
-	await testBrowser(t, 'chrome', baseURL, pages);
+	if (await testBrowser(t, 'firefox', baseURL, pages)) {
+		console.log('Firefox tests ran');
+	}
+	if (await testBrowser(t, 'chrome', baseURL, pages)) {
+		console.log('Chrome tests ran');
+	}
 }
 
 main().catch(t.error);

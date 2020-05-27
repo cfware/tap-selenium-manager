@@ -35,11 +35,13 @@ async function main() {
 	const baseURL = `http://localhost:${daemon.server.address().port}/`;
 
 	await t.rejects(testBrowser(t), TypeError);
-	await testBrowser(t, deadBrowser, baseURL, {
+	let tested = await testBrowser(t, deadBrowser, baseURL, {
 		async 'page1.html'(t) {
 			t.fail('should not get here');
 		}
 	});
+
+	t.equal(tested, false);
 
 	await t.test('after deadBrowser', async t => t.same(global.__coverage__, {}));
 
@@ -57,12 +59,20 @@ async function main() {
 		}
 	};
 
-	await testBrowser(t, 'chrome', baseURL, pages);
-	await t.test('after chrome', async t => {
-		t.same(JSON.parse(JSON.stringify(global.__coverage__)), gotCoverage);
-		t.ok(Object.keys(global.__coverage__).length);
-	});
-	global.__coverage__ = {};
+	const standardTest = async browser => {
+		tested = await testBrowser(t, browser, baseURL, pages);
+		if (tested) {
+			await t.test(`after ${browser}`, async t => {
+				t.same(JSON.parse(JSON.stringify(global.__coverage__)), gotCoverage);
+				t.ok(Object.keys(global.__coverage__).length);
+			});
+
+			global.__coverage__ = {};
+		}
+	};
+
+	await standardTest('chrome');
+	await standardTest('firefox');
 
 	const simulateDaemon = {
 		calls: {
@@ -81,7 +91,7 @@ async function main() {
 			return baseURL;
 		}
 	};
-	await testBrowser(t, 'firefox', simulateDaemon, {
+	tested = await testBrowser(t, 'firefox', simulateDaemon, {
 		async 'page1.html'(t, selenium) {
 			t.same(simulateDaemon.calls, {
 				start: 1,
@@ -99,15 +109,17 @@ async function main() {
 			await pages['page2.html'](t, selenium);
 		}
 	});
-	await t.test('after firefox', async t => {
-		t.same(simulateDaemon.calls, {
-			start: 1,
-			stop: 1,
-			url: 1
+	if (tested) {
+		await t.test('after firefox', async t => {
+			t.same(simulateDaemon.calls, {
+				start: 1,
+				stop: 1,
+				url: 1
+			});
+			t.same(JSON.parse(JSON.stringify(global.__coverage__)), gotCoverage);
+			t.ok(Object.keys(global.__coverage__).length);
 		});
-		t.same(JSON.parse(JSON.stringify(global.__coverage__)), gotCoverage);
-		t.ok(Object.keys(global.__coverage__).length);
-	});
+	}
 
 	t.test('platformBin for linux', platformTest('linux'));
 	t.test('platformBin for mac', platformTest('mac'));
