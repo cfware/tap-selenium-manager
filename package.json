@@ -1,6 +1,6 @@
 {
   "name": "@cfware/tap-selenium-manager",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Selenium Manager for tap",
   "main": "index.js",
   "type": "module",
