@@ -38,7 +38,6 @@
     "fastify": "^2.11.0",
     "fastify-babel": "^1.3.0",
     "fastify-static": "^2.6.0",
-    "geckodriver": "^1.19.1",
     "libtap": "^0.3.0",
     "nyc": "^15.0.0",
     "tap-yaml-summary": "^0.1.0"
