@@ -63,12 +63,7 @@ export async function testBrowser(t, browser, daemon, pages) {
 
 	const selenium = await build(builder);
 	if (!selenium) {
-		t.test(
-			browser,
-			{skip: true},
-			/* istanbul ignore next: unreachable but still required */
-			() => {}
-		);
+		t.skip(browser);
 
 		return false;
 	}
