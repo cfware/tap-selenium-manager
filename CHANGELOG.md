@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://www.github.com/cfware/tap-selenium-manager/compare/v1.0.0...v1.1.0) (2020-05-28)
+
+
+### Features
+
+* testBrowser resolves boolean telling if tests ran ([1cc8402](https://www.github.com/cfware/tap-selenium-manager/commit/1cc840298985c66221932dcff516aa10079acd2b))
+
 ## [1.0.0](https://www.github.com/cfware/tap-selenium-manager/compare/v0.1.0...v1.0.0) (2020-05-18)
 
 
