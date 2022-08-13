@@ -2,7 +2,7 @@ import path from 'path';
 import t from 'libtap';
 import fastify from 'fastify';
 import fastifyBabel from 'fastify-babel';
-import fastifyStatic from 'fastify-static';
+import fastifyStatic from '@fastify/static';
 
 import {grabImage, testBrowser} from './index.js';
 import platformBin from './platform-bin.js';
@@ -30,7 +30,7 @@ async function main() {
 	daemon
 		.register(fastifyStatic, {root: path.resolve('htdocs')})
 		.register(fastifyBabel, {babelrc});
-	await daemon.listen(0);
+	await daemon.listen();
 	daemon.server.unref();
 	const baseURL = `http://localhost:${daemon.server.address().port}/`;
 
@@ -71,59 +71,68 @@ async function main() {
 		}
 	};
 
-	await standardTest('chrome');
-	await standardTest('firefox');
+	const daemonTest = async browser => {
+		const simulateDaemon = {
+			calls: {
+				start: 0,
+				stop: 0,
+				url: 0
+			},
+			async start() {
+				simulateDaemon.calls.start++;
+			},
+			async stop() {
+				simulateDaemon.calls.stop++;
+			},
+			get baseURL() {
+				simulateDaemon.calls.url++;
+				return baseURL;
+			}
+		};
 
-	const simulateDaemon = {
-		calls: {
-			start: 0,
-			stop: 0,
-			url: 0
-		},
-		async start() {
-			simulateDaemon.calls.start++;
-		},
-		async stop() {
-			simulateDaemon.calls.stop++;
-		},
-		get baseURL() {
-			simulateDaemon.calls.url++;
-			return baseURL;
+		tested = await testBrowser(t, browser, simulateDaemon, {
+			async 'page1.html'(t, selenium) {
+				t.same(simulateDaemon.calls, {
+					start: 1,
+					stop: 0,
+					url: 1
+				});
+				await pages['page1.html'](t, selenium);
+			},
+			async 'page2.html'(t, selenium) {
+				t.same(simulateDaemon.calls, {
+					start: 1,
+					stop: 0,
+					url: 1
+				});
+				await pages['page2.html'](t, selenium);
+			}
+		});
+
+		if (tested) {
+			await t.test(`after ${browser}`, async t => {
+				t.same(simulateDaemon.calls, {
+					start: 1,
+					stop: 1,
+					url: 1
+				});
+				t.same(JSON.parse(JSON.stringify(global.__coverage__)), gotCoverage);
+				t.ok(Object.keys(global.__coverage__).length);
+			});
+
+			global.__coverage__ = {};
 		}
 	};
-	tested = await testBrowser(t, 'firefox', simulateDaemon, {
-		async 'page1.html'(t, selenium) {
-			t.same(simulateDaemon.calls, {
-				start: 1,
-				stop: 0,
-				url: 1
-			});
-			await pages['page1.html'](t, selenium);
-		},
-		async 'page2.html'(t, selenium) {
-			t.same(simulateDaemon.calls, {
-				start: 1,
-				stop: 0,
-				url: 1
-			});
-			await pages['page2.html'](t, selenium);
-		}
-	});
-	if (tested) {
-		await t.test('after firefox', async t => {
-			t.same(simulateDaemon.calls, {
-				start: 1,
-				stop: 1,
-				url: 1
-			});
-			t.same(JSON.parse(JSON.stringify(global.__coverage__)), gotCoverage);
-			t.ok(Object.keys(global.__coverage__).length);
-		});
-	}
 
-	t.test('platformBin for linux', platformTest('linux'));
-	t.test('platformBin for mac', platformTest('mac'));
-	t.test('platformBin for win32', platformTest('win32'));
+	await standardTest('firefox');
+	await daemonTest('firefox');
+
+	await standardTest('chrome');
+	await daemonTest('chrome');
+
+	await t.test('platformBin for linux', platformTest('linux'));
+	await t.test('platformBin for mac', platformTest('mac'));
+	await t.test('platformBin for win32', platformTest('win32'));
 
 	global.__coverage__ = selfCoverage;
 }
