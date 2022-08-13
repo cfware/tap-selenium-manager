@@ -14,8 +14,7 @@ async function build(builder) {
 		await selenium.get('data:text/plain,');
 
 		return selenium;
-	} catch {
-	}
+	} catch {}
 }
 
 export async function grabImage(element) {
