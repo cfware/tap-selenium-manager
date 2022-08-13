@@ -38,6 +38,7 @@
     "cross-env": "^7.0.3",
     "fastify": "^4.4.0",
     "fastify-babel": "^3.0.0",
+    "is-ci": "^2.0.0",
     "libtap": "^1.4.0",
     "nyc": "^15.1.0",
     "tap-yaml-summary": "^0.2.0"
