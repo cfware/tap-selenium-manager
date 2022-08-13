@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/cfware/tap-selenium-manager/compare/v1.1.0...v2.0.0) (2022-08-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Node.js 16 is required
+
+### Features
+
+* Update dependencies ([90597cc](https://github.com/cfware/tap-selenium-manager/commit/90597cc485a3b125570759a56ea48392acce0d6f))
+
 ## [1.1.0](https://www.github.com/cfware/tap-selenium-manager/compare/v1.0.0...v1.1.0) (2020-05-28)
 
 
