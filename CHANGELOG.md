@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/cfware/tap-selenium-manager/compare/v2.0.0...v3.0.0) (2023-10-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Upgrade dependencies
+
+### Features
+
+* Upgrade dependencies ([fa7a8d4](https://github.com/cfware/tap-selenium-manager/commit/fa7a8d418c315714d14f92cf068ae308ce7264be))
+
 ## [2.0.0](https://github.com/cfware/tap-selenium-manager/compare/v1.1.0...v2.0.0) (2022-08-13)
 
 
