@@ -7,102 +7,102 @@ import builderChrome from './builder-chrome.js';
 const png = pngjs.PNG.sync;
 
 async function build(builder) {
-	try {
-		const selenium = await builder().build();
+    try {
+        const selenium = await builder().build();
 
-		/* Verify the browser can start */
-		await selenium.get('data:text/plain,');
+        /* Verify the browser can start */
+        await selenium.get('data:text/plain,');
 
-		return selenium;
-	} catch {}
+        return selenium;
+    } catch {}
 }
 
 export async function grabImage(element) {
-	const image64 = await element.takeScreenshot();
-	return png.write(png.read(Buffer.from(image64, 'base64')));
+    const image64 = await element.takeScreenshot();
+    return png.write(png.read(Buffer.from(image64, 'base64')));
 }
 
 async function getBaseURL(daemon) {
-	if (typeof daemon === 'string') {
-		return daemon;
-	}
+    if (typeof daemon === 'string') {
+        return daemon;
+    }
 
-	await daemon.start();
-	return daemon.baseURL;
+    await daemon.start();
+    return daemon.baseURL;
 }
 
 async function stopDaemon(daemon) {
-	if (typeof daemon === 'string') {
-		return;
-	}
+    if (typeof daemon === 'string') {
+        return;
+    }
 
-	await daemon.stop();
+    await daemon.stop();
 }
 
 export async function testBrowser(t, browser, daemon, pages) {
-	let builder;
-	let foundCoverage = false;
-	const coverageMap = libCoverage.createCoverageMap();
+    let builder;
+    let foundCoverage = false;
+    const coverageMap = libCoverage.createCoverageMap();
 
-	switch (browser) {
-		case 'chrome':
-			builder = builderChrome;
-			break;
-		case 'firefox':
-			builder = builderFirefox;
-			break;
-		default:
-			if (typeof browser !== 'function') {
-				throw new TypeError(`Unknown browser: ${browser}`);
-			}
+    switch (browser) {
+        case 'chrome':
+            builder = builderChrome;
+            break;
+        case 'firefox':
+            builder = builderFirefox;
+            break;
+        default:
+            if (typeof browser !== 'function') {
+                throw new TypeError(`Unknown browser: ${browser}`);
+            }
 
-			builder = browser;
-			browser = builder.name;
-	}
+            builder = browser;
+            browser = builder.name;
+    }
 
-	const selenium = await build(builder);
-	if (!selenium) {
-		t.skip(browser);
+    const selenium = await build(builder);
+    if (!selenium) {
+        t.skip(browser);
 
-		return false;
-	}
+        return false;
+    }
 
-	const baseURL = await getBaseURL(daemon);
-	await t.test(browser, {buffered: false}, async t => {
-		for (const [page, implementation] of Object.entries(pages)) {
-			t.test(page, {buffered: false}, async t => {
-				await selenium.get(`${baseURL}${page}`);
-				await implementation(t, selenium);
+    const baseURL = await getBaseURL(daemon);
+    await t.test(browser, {buffered: false}, async t => {
+        for (const [page, implementation] of Object.entries(pages)) {
+            t.test(page, {buffered: false}, async t => {
+                await selenium.get(`${baseURL}${page}`);
+                await implementation(t, selenium);
 
-				/* istanbul ignore else: coverage is always enabled in testing */
-				if (coverageMap) {
-					const coverage = await selenium.executeScript(
-						/* istanbul ignore next: sent to browser */
-						() => window.__coverage__
-					);
+                /* istanbul ignore else: coverage is always enabled in testing */
+                if (coverageMap) {
+                    const coverage = await selenium.executeScript(
+                        /* istanbul ignore next: sent to browser */
+                        () => window.__coverage__
+                    );
 
-					if (coverage) {
-						foundCoverage = true;
-						/* Merge coverage object from the browser running this test. */
-						coverageMap.merge(coverage);
-					}
-				}
-			});
-		}
-	});
+                    if (coverage) {
+                        foundCoverage = true;
+                        /* Merge coverage object from the browser running this test. */
+                        coverageMap.merge(coverage);
+                    }
+                }
+            });
+        }
+    });
 
-	await selenium.quit();
-	await stopDaemon(daemon);
+    await selenium.quit();
+    await stopDaemon(daemon);
 
-	/* istanbul ignore else: coverage is always enabled in testing */
-	if (foundCoverage) {
-		/* istanbul ignore else: coverage is always enabled in testing */
-		if (global.__coverage__) {
-			coverageMap.merge(global.__coverage__);
-		}
+    /* istanbul ignore else: coverage is always enabled in testing */
+    if (foundCoverage) {
+        /* istanbul ignore else: coverage is always enabled in testing */
+        if (global.__coverage__) {
+            coverageMap.merge(global.__coverage__);
+        }
 
-		global.__coverage__ = coverageMap.toJSON();
-	}
+        global.__coverage__ = coverageMap.toJSON();
+    }
 
-	return true;
+    return true;
 }
